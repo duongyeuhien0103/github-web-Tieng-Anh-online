@@ -1,0 +1,260 @@
+<template>
+  <div>
+    <div class="logoClass">
+      <img src="@/img/logo/logo.png">
+      <b class="ml-2">Phần mềm học tiếng anh HOANLT</b>
+      <div style="margin-left: auto;">
+        <b>Lê Tiến Hoàn</b>
+      </div>
+    </div>
+    <v-app>
+      <div class="custome-toolbar white">
+        <!-- v-breadcrumbs>
+          <v-icon slot="divider">forward</v-icon>
+          <v-breadcrumbs-item
+            v-for="(item,index) in breadcrumbsItems"
+            :key="index"
+          >
+            {{ item.name }}
+          </v-breadcrumbs-item>
+        </v-breadcrumbs> -->
+        <v-menu class="mr-3">
+          <v-btn
+            slot="activator"
+            color="primary"
+            dark
+            class="ma-0"
+          >
+            Thêm mới
+          </v-btn>
+          <v-list>
+            <v-list-tile
+              v-for="(item, index) in items"
+              :key="index"
+              @click="addClick(item)"
+            >
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+      </div>
+      <div class="move-layout-wraper">
+        <div id="container" class="listcontainer calendar-wrap">
+          <div id="left">
+            <div class="task-category">
+              <div>
+                <admin @changeTree="(val) => (breadcrumbsItems = val)" @listtask="(val) => (taskItems = val)"
+                  :history="history"
+                  >
+                </admin>
+              </div>
+            </div>
+          </div>
+          <div id="right">
+            <div id="handle"></div> 
+            <div class="task-content-wrap layout wrap">
+              <main class="flex xs12">
+                <section class="content">
+                  <task :listTaskItems="taskItems" :history="history"></task>
+                </section>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+    </v-app>
+    <add-grade ref='addRef' :type_id="typeId"></add-grade>
+  </div>
+</template>
+
+<script>
+import admin from './components/admin'
+import task from './components/task'
+
+export default {
+  data () {
+    return {
+      items: [
+        {
+          title: 'Add grade',
+          id: 1
+        }, {
+          title: 'Add semster',
+          id: 2
+        }, {
+          title: 'Add week',
+          id: 3
+        }, {
+          title: 'Add Day',
+          id: 4
+        }, {
+          title: 'Add Lesson',
+          id: 5
+        }, {
+          title: 'Add Task',
+          id: 6
+        }
+      ],
+      typeId: '',
+      changeTree: [],
+      breadcrumbsItems: [],
+      taskItems: [],
+      history: [
+        {
+          grade: 2,
+          semester: 0,
+          week: 1,
+          day: 1,
+          lesson: 0,
+          task: 0
+        }
+      ]
+    }
+  },
+  name: 'App',
+  components: {
+    admin,
+    task
+  },
+  computed: {
+    history () {
+      return this.history
+    }
+  },
+  created () {
+    this.$nextTick(function () {
+      var isResizing = false
+      window.$(function () {
+        var container = window.$('#container')
+        var left = window.$('#left')
+        var right = window.$('#right')
+        var handle = window.$('#handle')
+        handle.on('mousedown', function (e) {
+          isResizing = true
+        })
+        window.$(document).on('mousemove', function (e) {
+          if (!isResizing) {
+            return
+          }
+          var offsetRight = container.width() - (e.clientX - container.offset().left)
+          left.css('right', offsetRight)
+          right.css('width', offsetRight)
+        }).on('mouseup', function (e) {
+          isResizing = false
+        })
+      })
+    })
+  },
+  methods: {
+    addClick (item) {
+      var vm = this
+      vm.typeId = item.id
+      vm.$refs.addRef.initGetData(vm.typeId)
+    }
+  }
+}
+</script>
+<style>
+  .logoClass{
+    padding: 10px 15px;
+    align-items: center;
+    display: flex;
+    font-size: 13px
+  }
+  .logoClass img{
+    max-height: 35px;
+  }
+  .application--wrap{
+    padding: 10px;
+  }
+  .move-layout-wraper{
+    position: relative;
+    min-height: 100vh;
+    max-height: 100%;
+  }
+  .custome-toolbar{
+    border-bottom: 2px solid #e7f5fd!important;
+    height: 40px;
+    align-items: center;
+    display: flex;
+  }
+  .custome-toolbar .v-menu{
+    margin-left: auto;
+  }
+  .listcontainer {
+    display: flex;
+  }
+
+  div.inlineaaaa {
+    float:left;
+  }
+  #container {
+    width: 100%;
+    height: 100%;
+    /* Disable selection so it doesn't get annoying */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: moz-none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  #container #left {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 80%;
+      min-width: 20%;
+      max-width: 80%;
+      background: #fff
+  }
+  #container #right {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 80%;
+      min-width: 20%;
+      max-width: 80%;
+      min-height: 40px;
+      background: #fff
+  }
+  #container #handle {
+      position: absolute;
+      left: -4px;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: w-resize;
+  }
+  #handle{
+    position: absolute;
+    left: -4px;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: w-resize;
+    background: #eee;
+  }
+  .task-content-wrap {
+    padding: 10px;
+  }
+</style>
+
+<!-- class dung chung -->
+<style>
+  .center-all{
+    display: flex;
+    align-items: center;
+  }
+  .float-right{
+    float: right;
+  }
+</style>
+<!-- custom class -->
+<style>
+  .v-btn{
+    height: 26px;
+  }
+</style>
